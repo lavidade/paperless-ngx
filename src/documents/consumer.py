@@ -358,11 +358,13 @@ class ConsumerPlugin(
                 f"[{Document.ARCHIVE_SERIAL_NUMBER_MIN:,}, "
                 f"{Document.ARCHIVE_SERIAL_NUMBER_MAX:,}]",
             )
+        """
         if Document.objects.filter(archive_serial_number=self.metadata.asn).exists():
             self._fail(
                 ConsumerStatusShortMessage.ASN_ALREADY_EXISTS,
                 f"Not consuming {self.filename}: Given ASN {self.metadata.asn} already exists!",
             )
+        """
 
     def run_pre_consume_script(self):
         """

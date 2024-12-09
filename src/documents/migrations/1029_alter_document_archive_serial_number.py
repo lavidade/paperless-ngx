@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
                 db_index=True,
                 help_text="The position of this document in your physical document archive.",
                 null=True,
-                unique=True,
+                unique=False,
                 validators=[
                     django.core.validators.MaxValueValidator(4294967295),
                     django.core.validators.MinValueValidator(0),

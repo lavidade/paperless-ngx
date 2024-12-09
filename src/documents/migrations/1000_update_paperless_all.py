@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
                 db_index=True,
                 help_text="The position of this document in your physical document archive.",
                 null=True,
-                unique=True,
+                unique=False,
             ),
         ),
         migrations.AddField(
