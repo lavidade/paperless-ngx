@@ -4155,7 +4155,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         WHEN:
             - API request to update document with same ASN
         THEN:
-            - Explicit error is returned
+            - Lavida permits the shared ASN
         """
         user1 = UserFactory(username="test1", superuser=True)
 
@@ -4182,15 +4182,10 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
                 "archive_serial_number": 1,
             },
         )
-        self.assertEqual(result.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(
-            result.json(),
-            {
-                "archive_serial_number": [
-                    "Document with this Archive Serial Number already exists in the trash.",
-                ],
-            },
-        )
+        self.assertEqual(result.status_code, status.HTTP_200_OK)
+        doc2.refresh_from_db()
+        self.assertEqual(doc2.archive_serial_number, 1)
+
 
     def test_remove_inbox_tags(self) -> None:
         """
