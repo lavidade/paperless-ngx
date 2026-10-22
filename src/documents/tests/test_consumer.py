@@ -505,9 +505,9 @@ class TestConsumer(
 
         Document.objects.all().delete()
 
-        with self.assertRaisesMessage(ConsumerError, "document is in the trash"):
-            with self.get_consumer(self.get_test_file()) as consumer:
-                consumer.run()
+        with self.get_consumer(self.get_test_file()) as consumer:
+            consumer.run()
+        self.assertEqual(Document.global_objects.filter(archive_serial_number=123).count(), 2)
 
     def testAsnExists(self):
         with self.get_consumer(
@@ -516,12 +516,12 @@ class TestConsumer(
         ) as consumer:
             consumer.run()
 
-        with self.assertRaisesMessage(ConsumerError, "ASN 123 already exists"):
-            with self.get_consumer(
-                self.get_test_file2(),
-                DocumentMetadataOverrides(asn=123),
-            ) as consumer:
-                consumer.run()
+        with self.get_consumer(
+            self.get_test_file2(),
+            DocumentMetadataOverrides(asn=123),
+        ) as consumer:
+            consumer.run()
+        self.assertEqual(Document.global_objects.filter(archive_serial_number=123).count(), 2)
 
     def testAsnExistsInTrash(self):
         with self.get_consumer(
@@ -533,12 +533,12 @@ class TestConsumer(
             document = Document.objects.first()
             document.delete()
 
-        with self.assertRaisesMessage(ConsumerError, "document is in the trash"):
-            with self.get_consumer(
-                self.get_test_file2(),
-                DocumentMetadataOverrides(asn=123),
-            ) as consumer:
-                consumer.run()
+        with self.get_consumer(
+            self.get_test_file2(),
+            DocumentMetadataOverrides(asn=123),
+        ) as consumer:
+            consumer.run()
+        self.assertEqual(Document.global_objects.filter(archive_serial_number=123).count(), 2)
 
     @mock.patch("documents.parsers.document_consumer_declaration.send")
     def testNoParsers(self, m):

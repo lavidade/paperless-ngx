@@ -836,7 +836,7 @@ class ConsumerPreflightPlugin(
 
     def pre_check_asn_value(self):
         """
-        Check that if override_asn is given, it is unique and within a valid range
+        Validate the ASN range; Lavida permits shared archive serial numbers.
         """
         if self.metadata.asn is None:
             # check not necessary in case no ASN gets set
@@ -853,21 +853,6 @@ class ConsumerPreflightPlugin(
                 f"Given ASN {self.metadata.asn} is out of range "
                 f"[{Document.ARCHIVE_SERIAL_NUMBER_MIN:,}, "
                 f"{Document.ARCHIVE_SERIAL_NUMBER_MAX:,}]",
-            )
-        existing_asn_doc = Document.global_objects.filter(
-            archive_serial_number=self.metadata.asn,
-        )
-        if existing_asn_doc.exists():
-            msg = ConsumerStatusShortMessage.ASN_ALREADY_EXISTS
-            log_msg = f"Not consuming {self.filename}: Given ASN {self.metadata.asn} already exists!"
-
-            if existing_asn_doc.first().deleted_at is not None:
-                msg = ConsumerStatusShortMessage.ASN_ALREADY_EXISTS_IN_TRASH
-                log_msg += " Note: existing document is in the trash."
-
-            self._fail(
-                msg,
-                log_msg,
             )
 
     def run(self) -> None:
