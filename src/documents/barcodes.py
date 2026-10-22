@@ -141,17 +141,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
         """
         Apply a detected ASN to metadata if allowed.
         """
-        if (
-            self.metadata.skip_asn_if_exists
-            and Document.global_objects.filter(
-                archive_serial_number=detected_asn,
-            ).exists()
-        ):
-            logger.info(
-                f"Found ASN in barcode {detected_asn} but skipping because it already exists.",
-            )
-            return
-
+        # Lavida: a detected ASN may identify several physical documents.
         logger.info(f"Found ASN in barcode: {detected_asn}")
         self.metadata.asn = detected_asn
 

@@ -566,12 +566,12 @@ class TestConsumer(
         ) as consumer:
             consumer.run()
 
-        with self.assertRaisesMessage(ConsumerError, "ASN 123 already exists"):
-            with self.get_consumer(
-                self.get_test_file2(),
-                DocumentMetadataOverrides(asn=123),
-            ) as consumer:
-                consumer.run()
+        with self.get_consumer(
+            self.get_test_file2(),
+            DocumentMetadataOverrides(asn=123),
+        ) as consumer:
+            consumer.run()
+        self.assertEqual(Document.global_objects.filter(archive_serial_number=123).count(), 2)
 
     def testAsnExistsInTrash(self) -> None:
         with self.get_consumer(
@@ -584,12 +584,12 @@ class TestConsumer(
             assert document is not None
             document.delete()
 
-        with self.assertRaisesMessage(ConsumerError, "document is in the trash"):
-            with self.get_consumer(
-                self.get_test_file2(),
-                DocumentMetadataOverrides(asn=123),
-            ) as consumer:
-                consumer.run()
+        with self.get_consumer(
+            self.get_test_file2(),
+            DocumentMetadataOverrides(asn=123),
+        ) as consumer:
+            consumer.run()
+        self.assertEqual(Document.global_objects.filter(archive_serial_number=123).count(), 2)
 
     @mock.patch("documents.consumer.get_parser_registry")
     def testNoParsers(self, m) -> None:
@@ -1723,7 +1723,7 @@ class TestBarcodeApplyDetectedASN(TestCase):
         - If skip_asn_if_exists is set, and ASN does not exist, set ASN
     """
 
-    def test_apply_detected_asn_skips_existing_when_flag_set(self) -> None:
+    def test_apply_detected_asn_reuses_existing_when_flag_set(self) -> None:
         doc = Document.objects.create(
             checksum="X1",
             title="D1",
@@ -1739,7 +1739,7 @@ class TestBarcodeApplyDetectedASN(TestCase):
         )
 
         plugin._apply_detected_asn(123)
-        self.assertIsNone(plugin.metadata.asn)
+        self.assertEqual(plugin.metadata.asn, 123)
 
         doc.hard_delete()
 
