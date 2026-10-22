@@ -20,7 +20,7 @@ services:
       - "--log-level=warn"
       - "--log-format=text"
   tika:
-    image: ghcr.io/paperless-ngx/tika:latest
+    image: docker.io/apache/tika:2.9.2.1-full@sha256:ae0b86d3c4d06d8997407fcb08f31a7259fff91c43e0c1d7fffdad1e9ade3fe8
     hostname: tika
     container_name: tika
     network_mode: host
