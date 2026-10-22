@@ -24,6 +24,7 @@ repos:
         args:
           - "--fix=lf"
       - id: trailing-whitespace
+        exclude: \.patch$
         exclude_types:
           - svg
       - id: check-case-conflict
@@ -64,6 +65,7 @@ repos:
     rev: v6.2.1
     hooks:
       - id: beautysh
+        additional_dependencies: [setuptools<81]
         args:
           - "--tab"
   - repo: https://github.com/shellcheck-py/shellcheck-py
