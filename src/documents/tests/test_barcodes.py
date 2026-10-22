@@ -15,7 +15,6 @@ from rest_framework import status
 from documents import tasks
 from documents.barcodes import BarcodePlugin
 from documents.barcodes import read_barcode_values
-from documents.consumer import ConsumerError
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
@@ -104,14 +103,14 @@ class TestBarcode(
 
     @override_settings(CONSUMER_ENABLE_ASN_BARCODE=True)
     @pytest.mark.usefixtures("fake_progress_manager")
-    def test_asn_barcode_duplicate_in_trash_fails(self) -> None:
+    def test_asn_barcode_duplicate_in_trash_is_preserved(self) -> None:
         """
         GIVEN:
             - A document with ASN barcode 123 is in the trash
         WHEN:
             - A file with the same barcode ASN is consumed
         THEN:
-            - The ASN check is re-run and consumption fails
+            - Consumption succeeds and retains the shared ASN
         """
         test_file = self.BARCODE_SAMPLE_DIR / "barcode-39-asn-123.pdf"
 
@@ -128,14 +127,21 @@ class TestBarcode(
         dupe_asn = settings.SCRATCH_DIR / "barcode-39-asn-123-second.pdf"
         shutil.copy(test_file, dupe_asn)
 
-        with self.assertRaisesRegex(ConsumerError, r"ASN 123.*trash"):
-            tasks.consume_file(
-                ConsumableDocument(
-                    source=DocumentSource.ConsumeFolder,
-                    original_file=dupe_asn,
-                ),
-                None,
-            )
+        tasks.consume_file(
+            ConsumableDocument(
+                source=DocumentSource.ConsumeFolder,
+                original_file=dupe_asn,
+            ),
+            None,
+        )
+        self.assertEqual(
+            Document.objects.get(archive_serial_number=123).archive_serial_number,
+            123,
+        )
+        self.assertEqual(
+            Document.global_objects.filter(archive_serial_number=123).count(),
+            2,
+        )
 
     @override_settings(
         CONSUMER_BARCODE_TIFF_SUPPORT=True,

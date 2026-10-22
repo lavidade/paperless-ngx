@@ -19,7 +19,6 @@ from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.data_models import StoredBarcode
-from documents.models import Document
 from documents.models import PaperlessTask
 from documents.models import Tag
 from documents.plugins.base import ConsumeTaskPlugin

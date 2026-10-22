@@ -201,7 +201,9 @@ class AsnTests(unittest.TestCase):
                             (
                                 "archive_serial_number",
                                 models.PositiveIntegerField(
-                                    unique=True, null=True, db_index=True,
+                                    unique=True,
+                                    null=True,
+                                    db_index=True,
                                 ),
                             ),
                         ],
@@ -252,7 +254,8 @@ class AsnTests(unittest.TestCase):
                     )
                     with connection.cursor() as cursor:
                         constraints = connection.introspection.get_constraints(
-                            cursor, tag._meta.db_table,
+                            cursor,
+                            tag._meta.db_table,
                         )
                     self.assertIn("documents_tag_name_uniq", constraints)
                 finally:

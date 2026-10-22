@@ -571,7 +571,10 @@ class TestConsumer(
             DocumentMetadataOverrides(asn=123),
         ) as consumer:
             consumer.run()
-        self.assertEqual(Document.global_objects.filter(archive_serial_number=123).count(), 2)
+        self.assertEqual(
+            Document.global_objects.filter(archive_serial_number=123).count(),
+            2,
+        )
 
     def testAsnExistsInTrash(self) -> None:
         with self.get_consumer(
@@ -589,7 +592,10 @@ class TestConsumer(
             DocumentMetadataOverrides(asn=123),
         ) as consumer:
             consumer.run()
-        self.assertEqual(Document.global_objects.filter(archive_serial_number=123).count(), 2)
+        self.assertEqual(
+            Document.global_objects.filter(archive_serial_number=123).count(),
+            2,
+        )
 
     @mock.patch("documents.consumer.get_parser_registry")
     def testNoParsers(self, m) -> None:
