@@ -136,19 +136,17 @@ jobs:
             --dev \
             --frozen \
             pytest
-      - name: Upload test results to Codecov
+      - name: Retain test and coverage reports
         if: always()
-        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          flags: backend-python-${{ matrix.python-version }}
-          files: junit.xml
-          report_type: test_results
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
-        with:
-          flags: backend-python-${{ matrix.python-version }}
-          files: coverage.xml
-          report_type: coverage
+          name: backend-reports-python-${{ matrix.python-version }}
+          path: |
+            junit.xml
+            coverage.xml
+            htmlcov/
+          if-no-files-found: warn
+          retention-days: 7
       - name: Stop containers
         if: always()
         run: |
