@@ -6,10 +6,10 @@ values from 0 through 4294967295 are valid; negative values and overflow are not
 
 ## Application behavior
 
-- The model retains an indexed, nullable ASN field without uniqueness.
-- REST validation, including documents in the trash, permits repeated ASNs.
-- The consumer preserves range validation without rejecting an existing ASN.
-- On the v3 branch, barcode metadata handoff retains repeated detected ASNs.
+-   The model retains an indexed, nullable ASN field without uniqueness.
+-   REST validation, including documents in the trash, permits repeated ASNs.
+-   The consumer preserves range validation without rejecting an existing ASN.
+-   On the v3 branch, barcode metadata handoff retains repeated detected ASNs.
 
 ## Schema compatibility
 
@@ -30,14 +30,14 @@ changes are intentionally irreversible; a downgrade requires a consistent backup
 
 The tests use synthetic values such as ASN 42, not customer documents:
 
-- `src/documents/tests/test_lavida_asn.py`: REST reuse and range validation.
-- `src/documents/tests/test_consumer.py`: consumer ASN validation and, where
-  applicable, barcode metadata handoff.
-- `src/documents/tests/test_lavida_asn_migrations.py` on the 2.20 branch:
-  PostgreSQL migration-recorder history with synthetic legacy schema drift.
-- `scripts/test_lavida_asn.py`: isolated Django field/method/schema harness;
-  SQLite by default, or a dedicated synthetic PostgreSQL database selected by
-  `ASN_TEST_PG`.
+-   `src/documents/tests/test_lavida_asn.py`: REST reuse and range validation.
+-   `src/documents/tests/test_consumer.py`: consumer ASN validation and, where
+    applicable, barcode metadata handoff.
+-   `src/documents/tests/test_lavida_asn_migrations.py` on the 2.20 branch:
+    PostgreSQL migration-recorder history with synthetic legacy schema drift.
+-   `scripts/test_lavida_asn.py`: isolated Django field/method/schema harness;
+    SQLite by default, or a dedicated synthetic PostgreSQL database selected by
+    `ASN_TEST_PG`.
 
 Run the harness from the repository root with the test dependencies installed:
 

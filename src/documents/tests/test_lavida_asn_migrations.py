@@ -12,7 +12,10 @@ class LegacyAsnMigrationTests(TransactionTestCase):
             self.skipTest(
                 "Production migration contract is PostgreSQL; SQLite rebuilds have different semantics",
             )
-        self.assertTrue(connection.settings_dict["NAME"].startswith("test_"), "Synthetic test database required")
+        self.assertTrue(
+            connection.settings_dict["NAME"].startswith("test_"),
+            "Synthetic test database required",
+        )
         executor = MigrationExecutor(connection)
         target = executor.loader.graph.leaf_nodes()
         old = [("documents", "1046_workflowaction_remove_all_correspondents_and_more")]
@@ -52,10 +55,12 @@ class LegacyAsnMigrationTests(TransactionTestCase):
             executor = MigrationExecutor(connection)
             executor.migrate(target)
             current = executor.loader.project_state(target).apps.get_model(
-                "documents", "Document",
+                "documents",
+                "Document",
             )
             self.assertEqual(
-                current.objects.filter(archive_serial_number=42).count(), 2,
+                current.objects.filter(archive_serial_number=42).count(),
+                2,
             )
             current.objects.create(
                 checksum="legacy-c",
@@ -63,7 +68,8 @@ class LegacyAsnMigrationTests(TransactionTestCase):
                 mime_type="application/pdf",
             )
             self.assertEqual(
-                current.objects.filter(archive_serial_number=42).count(), 3,
+                current.objects.filter(archive_serial_number=42).count(),
+                3,
             )
         finally:
             MigrationExecutor(connection).migrate(target)

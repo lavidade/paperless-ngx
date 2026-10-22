@@ -28,10 +28,12 @@ def reconcile_schema(apps, schema_editor):
         )
     with schema_editor.connection.cursor() as cursor:
         constraints = schema_editor.connection.introspection.get_constraints(
-            cursor, Document._meta.db_table,
+            cursor,
+            Document._meta.db_table,
         )
         tag_constraints = schema_editor.connection.introspection.get_constraints(
-            cursor, Tag._meta.db_table,
+            cursor,
+            Tag._meta.db_table,
         )
     asn_unique = [
         c

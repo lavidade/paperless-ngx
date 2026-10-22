@@ -3224,7 +3224,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         doc2.refresh_from_db()
         self.assertEqual(doc2.archive_serial_number, 1)
 
-
     def test_remove_inbox_tags(self):
         """
         GIVEN:
