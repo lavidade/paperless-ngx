@@ -23,7 +23,12 @@ def version(tag):
 
 
 def request(url, token, method="GET", data=None, content_type=None):
-    headers = {"Authorization": "Bearer " + token, "Accept": ACCEPT}
+    headers = {
+        "Authorization": "Bearer " + token,
+        "Accept": "application/vnd.github+json"
+        if url.startswith("https://api.github.com/")
+        else ACCEPT,
+    }
     if content_type:
         headers["Content-Type"] = content_type
     req = urllib.request.Request(url, data=data, headers=headers, method=method)
