@@ -5,11 +5,11 @@ number. `main` tracks the maintained Paperless-ngx 3.3.3 Lavida source, includin
 subsequent synthetic test and CI fixes. Historical release tags identify the
 source of the corresponding published images, not the mutable `main` tip.
 
-| Display name | Git tag | Container tag |
-| --- | --- | --- |
-| Paperless-ngx 2.7.2 – Lavida Edition 1 | `v2.7.2-lavida.1` | `2.7.2-lavida.1` |
+| Display name                             | Git tag             | Container tag      |
+| ---------------------------------------- | ------------------- | ------------------ |
+| Paperless-ngx 2.7.2 – Lavida Edition 1   | `v2.7.2-lavida.1`   | `2.7.2-lavida.1`   |
 | Paperless-ngx 2.20.15 – Lavida Edition 1 | `v2.20.15-lavida.1` | `2.20.15-lavida.1` |
-| Paperless-ngx 3.3.3 – Lavida Edition 1 | `v3.3.3-lavida.1` | `3.3.3-lavida.1` |
+| Paperless-ngx 3.3.3 – Lavida Edition 1   | `v3.3.3-lavida.1`   | `3.3.3-lavida.1`   |
 
 Images are in `ghcr.io/lavidade/paperless-ngx`. Package access requires permission.
 `latest` selects the highest published stable Lavida version, currently 3.3.3.
