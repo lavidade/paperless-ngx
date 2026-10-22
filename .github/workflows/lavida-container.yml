@@ -2,7 +2,7 @@ name: Lavida container
 
 on:
   push:
-    branches: ['release/**']
+    branches: [main, 'release/2.7']
     tags: ['v*-lavida.*']
   workflow_dispatch:
 
@@ -41,7 +41,7 @@ jobs:
             version="${GITHUB_REF_NAME#v}"
             [[ "$version" =~ ^${upstream//./\.}-lavida\.[0-9]+$ ]] || { echo 'Release tag must match source version'; exit 1; }
           else
-            version="${upstream}-lavida-build.${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT}.${GITHUB_SHA:0:12}"
+            version="${upstream}-lavida.1-rc.${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT}.${GITHUB_SHA:0:12}"
           fi
           image="ghcr.io/${GITHUB_REPOSITORY,,}"
           echo "version=$version" >> "$GITHUB_OUTPUT"

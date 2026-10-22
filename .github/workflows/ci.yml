@@ -10,6 +10,7 @@ on:
     branches-ignore:
       - 'translations**'
       - 'release/**'
+  workflow_dispatch:
   pull_request:
     branches-ignore:
       - 'translations**'
@@ -26,9 +27,7 @@ jobs:
     # We want to run on external PRs, but not on our own internal PRs as they'll be run
     # by the push to the branch. Without this if check, checks are duplicated since
     # internal PRs match both the push and pull_request events.
-    if:
-      github.event_name == 'push' || github.event.pull_request.head.repo.full_name !=
-      github.repository
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
 
     name: Linting Checks
     runs-on: ubuntu-22.04
@@ -80,7 +79,7 @@ jobs:
           pipenv --python ${{ steps.setup-python.outputs.python-version }} run mkdocs build --config-file ./mkdocs.yml
       -
         name: Deploy documentation
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.repository_owner == 'paperless-ngx' && github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           echo "docs.paperless-ngx.com" > "${{ github.workspace }}/docs/CNAME"
           git config --global user.name "${{ github.actor }}"
@@ -311,7 +310,7 @@ jobs:
   build-docker-image:
     name: Build Docker image for ${{ github.ref_name }}
     runs-on: ubuntu-22.04
-    if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || startsWith(github.ref, 'refs/heads/fix-') || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/beta' || contains(github.ref, 'beta.rc') || startsWith(github.ref, 'refs/tags/v'))
+    if: github.repository_owner == 'paperless-ngx' && github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || startsWith(github.ref, 'refs/heads/fix-') || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/beta' || contains(github.ref, 'beta.rc') || startsWith(github.ref, 'refs/tags/v'))
     concurrency:
       group: ${{ github.workflow }}-build-docker-image-${{ github.ref_name }}
       cancel-in-progress: true
