@@ -9,7 +9,7 @@ values from 0 through 4294967295 are valid; negative values and overflow are not
 - The model retains an indexed, nullable ASN field without uniqueness.
 - REST validation, including documents in the trash, permits repeated ASNs.
 - The consumer preserves range validation without rejecting an existing ASN.
-- On the v3 branch, barcode metadata handoff retains repeated detected ASNs.
+- In v3, barcode metadata handoff retains repeated detected ASNs.
 
 ## Schema compatibility
 
@@ -20,8 +20,8 @@ The migration removes that constraint only when present, reconciles Django's
 field state, and restores the ownerless-tag name constraint only after checking
 for duplicates. It never renumbers or deletes ASNs or silently deduplicates tags.
 
-The 2.20 branch adds migration `1076_lavida_shared_asn` after upstream 1075;
-the v3 branch adds `0028_lavida_shared_asn` after upstream 0027. Follow the
+The 2.20 release adds migration `1076_lavida_shared_asn` after upstream 1075;
+the v3 release adds `0028_lavida_shared_asn` after upstream 0027. Follow the
 [upstream v3 migration guide](https://github.com/paperless-ngx/paperless-ngx/blob/v3.3.3/docs/migration-v3.md),
 including the required 2.20.15 intermediate version. These forward schema
 changes are intentionally irreversible; a downgrade requires a consistent backup.
@@ -33,7 +33,7 @@ The tests use synthetic values such as ASN 42, not customer documents:
 - `src/documents/tests/test_lavida_asn.py`: REST reuse and range validation.
 - `src/documents/tests/test_consumer.py`: consumer ASN validation and, where
   applicable, barcode metadata handoff.
-- `src/documents/tests/test_lavida_asn_migrations.py` on the 2.20 branch:
+- `src/documents/tests/test_lavida_asn_migrations.py` in the 2.20 release:
   PostgreSQL migration-recorder history with synthetic legacy schema drift.
 - `scripts/test_lavida_asn.py`: isolated Django field/method/schema harness;
   SQLite by default, or a dedicated synthetic PostgreSQL database selected by
@@ -47,5 +47,5 @@ python scripts/test_lavida_asn.py
 
 These tests do not establish full upgrade, OCR, optical barcode recognition,
 UI, import/export or performance acceptance. No deployment is performed here.
-The candidate workflow runs synthetic regression checks before publishing
-run/attempt-specific image tags; it does not publish stable release tags.
+See [Lavida Edition releases](LAVIDA-RELEASES.md) for versioned publication
+and immutable source provenance.

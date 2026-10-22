@@ -1,0 +1,37 @@
+name: Publish Lavida Edition
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Published stable GitHub release tag (vX.Y.Z-lavida.N)
+        required: true
+      digest:
+        description: Tested image index sha256 digest in this package
+        required: true
+      revision:
+        description: Expected immutable OCI source revision (40 hex)
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: lavida-stable-publication
+  cancel-in-progress: false
+jobs:
+  promote:
+    if: github.repository == 'lavidade/paperless-ngx' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: image-publishing
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Validate and promote tested manifest without rebuilding
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+          IMAGE_DIGEST: ${{ inputs.digest }}
+          OCI_REVISION: ${{ inputs.revision }}
+        run: python3 scripts/publish_lavida.py
