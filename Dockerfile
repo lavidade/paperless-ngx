@@ -204,6 +204,9 @@ WORKDIR /usr/src/paperless/src/
 # Change pretty frequently
 COPY --from=pipenv-base /usr/src/pipenv/requirements.txt ./
 
+# Vendored upstream commit: do not download a mutable pull-request patch.
+COPY docker/patches/whitenoise-6.6.0-threadpool.patch /tmp/whitenoise.patch
+
 # Packages needed only for building a few quick Python
 # dependencies
 ARG BUILD_PACKAGES="\
@@ -225,9 +228,8 @@ RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \
   && echo "Installing Python requirements" \
     && python3 -m pip install --default-timeout=1000 --requirement requirements.txt \
   && echo "Patching whitenoise for compression speedup" \
-    && curl --fail --silent --show-error --location --output 484.patch https://github.com/evansd/whitenoise/pull/484.patch \
-    && patch -d /usr/local/lib/python3.11/site-packages --verbose -p2 < 484.patch \
-    && rm 484.patch \
+    && patch --batch -d /usr/local/lib/python3.11/site-packages --verbose -p2 < /tmp/whitenoise.patch \
+    && rm /tmp/whitenoise.patch \
   && echo "Installing NLTK data" \
     && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" snowball_data \
     && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" stopwords \
