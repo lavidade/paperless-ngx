@@ -303,7 +303,7 @@ class Document(SoftDeleteModel, ModelWithOwner):
         _("archive serial number"),
         blank=True,
         null=True,
-        unique=True,
+        unique=False,
         db_index=True,
         validators=[
             MaxValueValidator(ARCHIVE_SERIAL_NUMBER_MAX),
