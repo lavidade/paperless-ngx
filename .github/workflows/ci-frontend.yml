@@ -172,18 +172,16 @@ jobs:
         run: cd src-ui && pnpm install --frozen-lockfile
       - name: Run Jest unit tests
         run: cd src-ui && pnpm run test --max-workers=2 --shard=${{ matrix.shard-index }}/${{ matrix.shard-count }}
-      - name: Upload test results to Codecov
+      - name: Retain test and coverage reports
         if: always()
-        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          flags: frontend-node-${{ matrix.node-version }}
-          directory: src-ui/
-          report_type: test_results
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
-        with:
-          flags: frontend-node-${{ matrix.node-version }}
-          directory: src-ui/coverage/
+          name: frontend-reports-node-${{ matrix.node-version }}-shard-${{ matrix.shard-index }}
+          path: |
+            src-ui/junit.xml
+            src-ui/coverage/
+          if-no-files-found: warn
+          retention-days: 7
   e2e-tests:
     name: E2E Tests
     needs: [changes, install-dependencies]
@@ -216,9 +214,9 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install uv
-        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
         with:
-          version: '0.12.x'
+          version: '0.13.x'
           enable-cache: false
           python-version: ${{ steps.setup-python.outputs.python-version }}
       - name: Cache frontend dependencies
