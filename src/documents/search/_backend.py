@@ -120,6 +120,19 @@ class SearchHit(TypedDict):
     highlights: dict[str, str]
 
 
+class PreparedSearchQuery(NamedTuple):
+    """Request-local parsed query, bound to its source and index instance.
+
+    Contains no results, document addresses or permissions. Never cache this
+    across requests: permission filters are applied afresh by search_ids.
+    """
+
+    text: str
+    mode: SearchMode
+    index: tantivy.Index
+    query: tantivy.Query
+
+
 class TantivyRelevanceList:
     """
     DRF-compatible list wrapper for Tantivy search results.
@@ -490,6 +503,36 @@ class TantivyBackend:
         else:
             return parse_user_query(self._index, query, tz)
 
+    def prepare_query(
+        self,
+        query: str,
+        search_mode: SearchMode = SearchMode.QUERY,
+    ) -> PreparedSearchQuery:
+        """Compile once for the ID search and subsequent page highlights."""
+        self._ensure_open()
+        return PreparedSearchQuery(
+            query,
+            search_mode,
+            self._index,
+            self._parse_query(query, search_mode),
+        )
+
+    def _resolve_query(
+        self,
+        query: str,
+        search_mode: SearchMode,
+        prepared_query: PreparedSearchQuery | None,
+    ) -> tantivy.Query:
+        if prepared_query is None:
+            return self._parse_query(query, search_mode)
+        if (
+            prepared_query.text != query
+            or prepared_query.mode is not search_mode
+            or prepared_query.index is not self._index
+        ):
+            raise ValueError("Prepared query does not match query, mode or index")
+        return prepared_query.query
+
     def _apply_permission_filter(
         self,
         query: tantivy.Query,
@@ -777,6 +820,7 @@ class TantivyBackend:
         *,
         search_mode: SearchMode = SearchMode.QUERY,
         rank_start: int = 1,
+        prepared_query: PreparedSearchQuery | None = None,
     ) -> list[SearchHit]:
         """
         Generate SearchHit dicts with highlights for specific document IDs.
@@ -800,7 +844,7 @@ class TantivyBackend:
             return []
 
         self._ensure_open()
-        user_query = self._parse_query(query, search_mode)
+        user_query = self._resolve_query(query, search_mode, prepared_query)
         # _parse_query normalizes its own copy; the snippet queries below are
         # built from the string directly, so normalize it here too.
         query = normalize_search_text(query)
@@ -928,6 +972,7 @@ class TantivyBackend:
         search_mode: SearchMode = SearchMode.QUERY,
         filter_query: str | None = None,
         limit: int | None = None,
+        prepared_query: PreparedSearchQuery | None = None,
     ) -> list[int]:
         """
         Return document IDs matching a query — no highlights or scores.
@@ -949,7 +994,7 @@ class TantivyBackend:
             List of document IDs in the requested order
         """
         self._ensure_open()
-        user_query = self._parse_query(query, search_mode)
+        user_query = self._resolve_query(query, search_mode, prepared_query)
         if filter_query is not None:
             user_query = user_query.and_must_match(
                 tantivy.Query.const_score_query(

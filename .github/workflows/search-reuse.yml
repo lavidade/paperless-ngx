@@ -1,0 +1,27 @@
+name: Isolated search query reuse
+on:
+  pull_request:
+    paths:
+      - 'src/documents/search/**'
+      - 'src/documents/views.py'
+      - 'tests/search_reuse/**'
+      - '.github/workflows/search-reuse.yml'
+permissions:
+  contents: read
+jobs:
+  synthetic-search:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - run: pip install tantivy==0.26.2 whoosh-compat==0.3.0 Django==5.2.13 filelock==4.2.4 pillow==13.0.0 regex==2026.9.29 pytest==9.1.1
+      - run: python -m pytest -c /dev/null -p no:cacheprovider tests/search_reuse -q
+      - name: Bounded synthetic smoke benchmark
+        env:
+          SEARCH_BENCH_WORKDIR: '${{ runner.temp }}/synthetic-search'
+        run: python tests/search_reuse/benchmark.py --size 2000 --samples 3

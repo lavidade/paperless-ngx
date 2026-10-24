@@ -2577,6 +2577,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
             return super().list(request)
 
         from documents.search import SearchHit
+        from documents.search import SearchMode
         from documents.search import SearchQueryError
         from documents.search import TantivyBackend
         from documents.search import TantivyRelevanceList
@@ -2656,6 +2657,11 @@ class UnifiedSearchViewSet(DocumentViewSet):
             # "score" is not a real Tantivy sort field — it means relevance order,
             # which is Tantivy's default when no sort field is specified.
             is_score_sort = sort_field_name == "score"
+            prepared_query = (
+                backend.prepare_query(query_str, search_mode)
+                if search_mode is SearchMode.TEXT
+                else None
+            )
             all_ids = backend.search_ids(
                 query_str,
                 user=user,
@@ -2665,6 +2671,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
                 sort_reverse=sort_reverse,
                 search_mode=search_mode,
                 filter_query=filter_query,
+                prepared_query=prepared_query,
             )
             ordered_ids = intersect_and_order(
                 all_ids,
@@ -2683,6 +2690,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
                 page_ids,
                 search_mode=search_mode,
                 rank_start=page_offset + 1,
+                prepared_query=prepared_query,
             )
             return SearchResultPage(
                 ordered_ids=ordered_ids,
