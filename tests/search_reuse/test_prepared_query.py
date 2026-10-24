@@ -64,10 +64,16 @@ def test_prepared_query_avoids_second_regex_compilation(backend):
     with patch.object(backend, "_parse_query", wraps=backend._parse_query) as parse:
         prepared = backend.prepare_query("alpha", SearchMode.TEXT)
         ids = backend.search_ids(
-            "alpha", None, search_mode=SearchMode.TEXT, prepared_query=prepared,
+            "alpha",
+            None,
+            search_mode=SearchMode.TEXT,
+            prepared_query=prepared,
         )
         hits = backend.highlight_hits(
-            "alpha", ids[:2], search_mode=SearchMode.TEXT, prepared_query=prepared,
+            "alpha",
+            ids[:2],
+            search_mode=SearchMode.TEXT,
+            prepared_query=prepared,
         )
         assert [hit["id"] for hit in hits] == ids[:2]
         assert parse.call_count == 1
@@ -99,13 +105,19 @@ def test_exact_baseline_parity(backend, mode, query):
     prepared = backend.prepare_query(query, mode)
     baseline_ids = backend.search_ids(query, None, search_mode=mode)
     reused_ids = backend.search_ids(
-        query, None, search_mode=mode, prepared_query=prepared,
+        query,
+        None,
+        search_mode=mode,
+        prepared_query=prepared,
     )
     assert reused_ids == baseline_ids
     for offset in (0, 1, 3):
         page = baseline_ids[offset : offset + 2]
         baseline = backend.highlight_hits(
-            query, page, search_mode=mode, rank_start=offset + 1,
+            query,
+            page,
+            search_mode=mode,
+            rank_start=offset + 1,
         )
         reused = backend.highlight_hits(
             query,
@@ -128,7 +140,10 @@ def test_prepared_query_rejects_other_source_mode_or_index(backend, tmp_path):
     register_tokenizers(other._index, "de")
     with pytest.raises(ValueError, match="does not match"):
         other.search_ids(
-            "alpha", None, search_mode=SearchMode.TEXT, prepared_query=prepared,
+            "alpha",
+            None,
+            search_mode=SearchMode.TEXT,
+            prepared_query=prepared,
         )
 
 
@@ -177,5 +192,8 @@ def test_filter_query_and_sort_parity(backend):
         limit=2,
     )
     assert backend.search_ids("alpha", None, **kwargs) == backend.search_ids(
-        "alpha", None, prepared_query=prepared, **kwargs,
+        "alpha",
+        None,
+        prepared_query=prepared,
+        **kwargs,
     )

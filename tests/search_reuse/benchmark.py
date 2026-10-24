@@ -78,7 +78,10 @@ for mode in [SearchMode.TEXT, SearchMode.QUERY]:
                 ids = b.search_ids(q, None, search_mode=mode, prepared_query=prepared)
                 t1 = time.perf_counter()
                 hits = b.highlight_hits(
-                    q, ids[:25], search_mode=mode, prepared_query=prepared,
+                    q,
+                    ids[:25],
+                    search_mode=mode,
+                    prepared_query=prepared,
                 )
                 t2 = time.perf_counter()
                 assert ids == expected_ids and hits == expected_hits
